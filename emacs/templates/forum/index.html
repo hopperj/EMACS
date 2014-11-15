@@ -1,0 +1,23 @@
+{% for question in latest_questions %}
+
+<div class="question-wrapper">
+  <hgroup>
+    <h3>Question: {{ question.question }}</h3>
+    <h4>Posted by: {{ question.user.username }}</h4>
+  </hgroup>
+  
+  <p><em>{{ question.tags }}</em></p>
+  <a href="http://127.0.0.1:8000/forum/question/{{ question.id }}/answer/new">Answer</a>
+
+{% if question.answers %}
+{% for answer in question.answers %}
+<div class="answer-wrapper">
+  <p>{{ answer.answer }}</p>
+  <p>{{answer.user.username }} said in {{ answer.language.name }}</p>
+<div
+{% endfor %}
+{% endif %}
+</div>
+
+<hr />
+{% endfor %}
