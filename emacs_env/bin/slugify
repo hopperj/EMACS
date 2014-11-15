@@ -1,0 +1,10 @@
+#!/home/pannellr/sandbox/python/EMACS/emacs_env/bin/python
+# EASY-INSTALL-ENTRY-SCRIPT: 'python-slugify==0.0.9','console_scripts','slugify'
+__requires__ = 'python-slugify==0.0.9'
+import sys
+from pkg_resources import load_entry_point
+
+if __name__ == '__main__':
+    sys.exit(
+        load_entry_point('python-slugify==0.0.9', 'console_scripts', 'slugify')()
+    )

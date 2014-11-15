@@ -1,10 +1,52 @@
-<!DOCTYPE html>
+{% load bootstrap3 %}
+{% load staticfiles %}
+<!doctype html>
 <html>
-    <head>
-        <title>My Project</title>
-    </head>
+<head>
+    <title>EMACS | Environmental Monitoring and Control System</title>
+    <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.js" />
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    {% bootstrap_css %}
+    {{ form.media }}
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}manager/styles.css">
+    <script type="text/javascript" src="{{ STATIC_URL }}manager/functions.js" ></script>
+</head>
+ 
+<body>
+  <div class="container">
 
-    <body>
-    {% block content %}{% endblock %}
-    </body>
+  <!-- Static navbar -->
+      <div class="navbar navbar-default" role="navigation">
+        <div class="container-fluid">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">EMACS User Dashboard</a>
+          </div>
+          <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+              
+	           </ul>
+          </div><!--/.nav-collapse -->
+      </div><!--/.container-fluid -->
+  </div>
+      
+  <div class="container">
+    <div id="spinner">
+	     <h3><span class="spinner-message"></span></h3>
+    </div>
+      <!-- Main component for a primary marketing message or call to action -->
+    <div class="jumbotron">
+	   {% block content %}{% endblock %}
+     {% block content-related %}{% endblock %}
+    </div>
+
+  </div>
+</div>
+</body>
+  {% bootstrap_javascript %}
 </html>

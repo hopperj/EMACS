@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% for record in device_1 %}
+
+	{{ record.as_p }}
+
+{% endfor %}
+
+{% endblock %}
