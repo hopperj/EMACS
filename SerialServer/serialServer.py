@@ -16,7 +16,7 @@ import sys, traceback
 
 class SerialServer:
 
-    def __init__(self, numberOfDevices=0, webAddress="http://192.168.100.207/monitor/new/", devicePrefix="/dev/ttyUSB", device=None, timeout=0.75, startCharacter='$'):
+    def __init__(self, numberOfDevices=0, webAddress="http://192.168.100.207/monitor/new/", devicePrefix="/dev/ttyUSB", device=None, timeout=0.50, startCharacter='$'):
         # Main web address
         self.webAddress = webAddress
         # Serial timeout value
@@ -75,11 +75,16 @@ class SerialServer:
         Get data from serial and store as a dictionary
         """
         tmp = ""
+        tmpData = ""
         data = {}
         try:
             ser.write('$')
             print "Start character sent"
-            tmpData = ser.read(4096)
+            tmpData = ""
+            tmp = ""
+            while tmp != "\n":
+                tmp = ser.read(1)
+                tmpData += tmp
         except serial.SerialTimeoutException:
             # Return 1 indicating error and None as the data
             return [1, None]
@@ -89,10 +94,13 @@ class SerialServer:
             return [1,None]
         print "tmpData:",tmpData
         try:
-            for ele in tmpData.split(","):
-                k,v = ele.split(':')
+            for ele in tmpData.rstrip().split(","):
+                k,v = ele.rstrip().split(':')
                 data[k] = v
         except ValueError:
+            print "error data:",ele
+            print ele.rstrip().split(':')
+            print "\n\n"
             traceback.print_exc(file=sys.stdout)
             return [1,None]
 
@@ -127,9 +135,11 @@ class SerialServer:
             print "Couldn't parse key value pairs."
         # Get rid of the last
         data = data[:-1]
-        ser.write('@')
         print "Sending:",data
-        ser.write(data)
+        ser.write('@')
+        while ser.read(1) != '@':
+            pass
+        #ser.write(data)
 
     def run(self):
         """
