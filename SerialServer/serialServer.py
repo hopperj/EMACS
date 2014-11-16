@@ -111,35 +111,61 @@ class SerialServer:
         """
         curl -H 'Content-Type: application/json' -d '{"device": 1, "sensor_name": "temp1", "value": 22, "created_at": "1000000987"}' 127.0.0.1:8000/monitor/new/
         """
-        # Put data into a json object
-        payload = json.dumps(data)
-        # Build headers
-        headers = {'content-type': 'application/json'}
-
-        response = requests.put(self.webAddress, data=payload, headers=headers)
+        created_at = datetime.now()
+        tmpData = {'device_id':data['device_id'], 'created_at':created_at}
+        response = ""
+        for k in ['temperature', 'pressure', 'humidity']:
+            tmpData = {'device_id':data['device_id'], 'created_at':created_at, 'sensor_name':k, 'value':data[k]}
+            # Put data into a json object
+            payload = json.dumps(tmpData)
+            # Build headers
+            headers = {'content-type': 'application/json'}
+            # {"device_id": "whiteroom", "sensor_name": "tempature", "value": 16, "created_at": "1001359001"}
+            response = requests.put(self.webAddress, data=payload, headers=headers).json()
         # Make sure that device id is valid. -1 indicates an error.
-        return response.json()
+        return response
 
     def sendToSerial(self, ser, res ):
         """
         Send control settings to Arduino
         """
+        # !P @T #H
+        # [[{"measure": "tempature", "id": 4, "value": "26", "device_id": 6},
+        # {"measure": "pressure", "id": 4, "value": "26", "device_id": 6} ],
+        # {"pressure_control": false, "device_name": "living room", "humidity_control": false, "tempature_control": false, "manufacturer_id": "whiteroom", "id": 6}]
         data = ""
-        print res.keys()
-        if len(res.keys())<1:
+        if len(res)<1:
             return
+
+        # Massive super hack to parse data and prepare it for the arduino
+        # Putting the capitol H in hackathon
         try:
-            for k,v in res.items():
-                data += str(k)+":"+str(v[0])+","
-        except:
-            print "Couldn't parse key value pairs."
-        # Get rid of the last
-        data = data[:-1]
-        print "Sending:",data
-        ser.write('@')
-        while ser.read(1) != '@':
-            pass
-        #ser.write(data)
+            for e in res[:-1]:
+                data = 'device_id'+':'+e['device_id']+','
+                data += 'controller'+':'+res[-1][e['measure']+"control"]+','
+                data += e['measure']+':'+e['value']
+                if 'temp' in e['measure'].lower():
+                    ser.write('!')
+                    while ser.read(1) != '!':
+                        pass
+                    # @device_id:H43B01,controller:1,temperature:22.3
+                    ser.write(data)
+                elif 'pressure' in e['measure'].lower():
+                    ser.write('@')
+                    while ser.read(1) != '@':
+                        pass
+                    # @device_id:H43B01,controller:1,temperature:22.3
+                    ser.write(data)        
+                elif 'humidity' in e['measure'].lower():
+                    ser.write('#')
+                    while ser.read(1) != '#':
+                        pass
+                    # @device_id:H43B01,controller:1,temperature:22.3
+                    ser.write(data)
+
+            except:
+                print "Couldn't parse key value pairs."
+
 
     def run(self):
         """
