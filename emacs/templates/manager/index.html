@@ -20,7 +20,7 @@
 
 
 <script type="text/javascript">
-            $.get('{% url "line_chart_json" %}', function(data) {
+            $.get('{% url "tempature_line_chart" %}', function(data) {
                 var ctx = $("#myChart").get(0).getContext("2d");
                 new Chart(ctx).Line(data);
             });

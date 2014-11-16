@@ -26,7 +26,13 @@ class JSONResponse(HttpResponse):
 
 @csrf_exempt
 def new_record(request):
+	
+
 	record = JSONParser().parse(request)
+	device = Device.objects.get(manufacturer_id=record['device_id'])
+	#del record['device_id']
+	record['device'] = device.id
+
 	serializer = RecordSerializer(data=record)
 	if serializer.is_valid():
 		# save record
@@ -54,24 +60,85 @@ class RecordListView(ListView):
 		return context
 
 
-class LineChartJSONView(BaseLineChartView):	
+class TempatureLineChartJSONView(BaseLineChartView):	
     def get_labels(self):
         
-        records = Record.objects.all()
+        records = Record.objects.filter(sensor_name="tempature").order_by('created_at')
         times = [record.created_at for record in records]
         return times
 
     def get_data(self):
-        records = Record.objects.all()
+        records = Record.objects.filter(sensor_name="tempature").order_by('created_at')
         value_map = dict()
         for record in records:
-        	if not record.device in value_map:
-        		value_map[record.device] = list()
+        	if not record.device.device_name in value_map:
+        		value_map[record.device.device_name] = list()
         	
-        	value_map[record.device].append(record.value)
+        	value_map[record.device.device_name].append(record.value)
+
+        	for name in value_map:
+        		if record.device.device_name != name:
+        			value_map[name].append('')
+
+        	for name in value_map:
+        		i = 0
+        		while i < len(value_map[name]):
+        			if value_map[name][i] == '':
+        				if i != 0 and i != (len(value_map[name]) -1):
+        					value_map[name][i] = (value_map[name][i-1] + value_map[name][i+1])/2
+
+
+        			i+=1		
+
 
         value_lists = list()
-        for device in value_map:
-        	value_lists.append(value_map[device])
+        for device_name in value_map:
+        	value_lists.append(value_map[device_name])
+
+        return value_lists
+
+
+class HumidityLineChartJSONView(BaseLineChartView):	
+    def get_labels(self):
+        
+        records = Record.objects.filter(sensor_name="humidity")
+        times = [record.created_at for record in records]
+        return times
+
+    def get_data(self):
+        records = Record.objects.filter(sensor_name="humidity")
+        value_map = dict()
+        for record in records:
+        	if not record.device.device_name in value_map:
+        		value_map[record.device.device_name] = list()
+        	
+        	value_map[record.device.device_name].append(record.value)
+
+        value_lists = list()
+        for device_name in value_map:
+        	value_lists.append(value_map[device_name])
+
+        return value_lists
+
+
+class PressureLineChartJSONView(BaseLineChartView):	
+    def get_labels(self):
+        
+        records = Record.objects.filter(sensor_name="pressure")
+        times = [record.created_at for record in records]
+        return times
+
+    def get_data(self):
+        records = Record.objects.filter(sensor_name="pressure")
+        value_map = dict()
+        for record in records:
+        	if not record.device.device_name in value_map:
+        		value_map[record.device.device_name] = list()
+        	
+        	value_map[record.device.device_name].append(record.value)
+
+        value_lists = list()
+        for device_name in value_map:
+        	value_lists.append(value_map[device_name])
 
         return value_lists
