@@ -6,15 +6,16 @@ Takes sensor data from Environmental sensors and publishes them to website
 
 
 import serial
-import urllib2
+from urllib2 import Request, urlopen, URLError
 from optparse import OptionParser
-
+import json
+import requests
 
 class SerialServer:
 
-    def __init__(self, numberOfDevices=0, webAddress="127.0.0.1", devicePrefix="/dev/ttyUSB", timeout=10.0, startCharacter='$'):
+    def __init__(self, numberOfDevices=0, webAddress="http://192.168.100.207/monitor/new/", devicePrefix="/dev/ttyUSB", timeout=10.0, startCharacter='$'):
         # Main web address
-        self.url = webAddress
+        self.webAddress = webAddress
         # Serial timeout value
         self.timeout = timeout
         # device location and prefix /dev/ttyUSB*
@@ -65,27 +66,21 @@ class SerialServer:
 
 
     def sendToWeb(self, data):
-        print data
+        """
+        curl -H 'Content-Type: application/json' -d '{"device": 1, "sensor_name": "temp1", "value": 22, "created_at": "1000000987"}' 127.0.0.1:8000/monitor/new/
+        """
+        payload = json.dumps(data)
+        headers = {'content-type': 'application/json'}
 
-    def getFromWeb(self, deviceID):
-        print data
+        response = requests.put(self.webAddress, data=payload, headers=headers)
+        print response
+
 
     def run(self):
 
         err, data = self.getData()
         if not err and data is not None:
             self.sendToWeb( data )
-
-
-
-
-
-params = urllib.urlencode({
-  'firstName': 'John',
-  'lastName': 'Doe'
-})
-response = urllib2.urlopen(url, params).read()
-
 
 
 if __name__ == "__main__":
@@ -99,5 +94,6 @@ if __name__ == "__main__":
 
     (options, args) = parser.parse_args()
 
-    SS = SerialServer(noOfDevices = options.noOfDevices)
-    SS.run()
+    SS = SerialServer(numberOfDevices = options.noOfDevices)
+    data = {"device": 1, "sensor_name": "temp1", "value": 22, "created_at": "1000000987"}
+    SS.sendToWeb( data )
