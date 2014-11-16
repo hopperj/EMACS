@@ -160,8 +160,10 @@ class SerialServer:
                     ser.write('#')
                     while ser.read(1) != '#':
                         pass
-                    # @device_id:H43B01,controller:1,temperature:22.3
+                    # !device_id:H43B01,controller:1,temperature:22.3
+                    # @device_id:H43B01,controller:1,pressure:101.2
                     ser.write(data)
+                    
 
             except:
                 print "Couldn't parse key value pairs."
