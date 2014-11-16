@@ -15,13 +15,63 @@
 			<span class="max">22</span>
 		</div>
 	</div>
-	<canvas id="myChart" class="visualization" width="500" height="400"></canvas>	
+	<canvas id="temp-chart" class="visualization" width="500" height="400"></canvas>	
 </div>
 
 
 <script type="text/javascript">
             $.get('{% url "tempature_line_chart" %}', function(data) {
-                var ctx = $("#myChart").get(0).getContext("2d");
+                var ctx = $("#temp-chart").get(0).getContext("2d");
+                new Chart(ctx).Line(data);
+            });
+ </script>
+
+<div class="widget-wrapper">
+	<div class="widget-header">
+		<span class="widget-title">Pressure</span>
+	</div>
+	<div class="pull-left current-state">
+		<div class="current-value">
+			<span class="the-value">18&deg</span>
+			<span class="the-measure">Average (C)</span>
+		</div>
+		<div class="min-max">
+			<span class="min">17</span>
+			<span class="max">22</span>
+		</div>
+	</div>
+	<canvas id="pressure-chart" class="visualization" width="500" height="400"></canvas>	
+</div>
+
+
+<script type="text/javascript">
+            $.get('{% url "pressure_line_chart" %}', function(data) {
+                var ctx = $("#pressure-chart").get(0).getContext("2d");
+                new Chart(ctx).Line(data);
+            });
+ </script>
+
+ <div class="widget-wrapper">
+	<div class="widget-header">
+		<span class="widget-title">Humidity</span>
+	</div>
+	<div class="pull-left current-state">
+		<div class="current-value">
+			<span class="the-value">18&deg</span>
+			<span class="the-measure">Average (C)</span>
+		</div>
+		<div class="min-max">
+			<span class="min">17</span>
+			<span class="max">22</span>
+		</div>
+	</div>
+	<canvas id="humidity-chart" class="visualization" width="500" height="400"></canvas>	
+</div>
+
+
+<script type="text/javascript">
+            $.get('{% url "humidity_line_chart" %}', function(data) {
+                var ctx = $("#humidity-chart").get(0).getContext("2d");
                 new Chart(ctx).Line(data);
             });
  </script>

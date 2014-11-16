@@ -11,6 +11,13 @@
     {{ form.media }}
     <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}manager/styles.css">
     <script type="text/javascript" src="{{ STATIC_URL }}manager/functions.js" ></script>
+
+    <script type="text/javascript">
+      var auto_refresh = setInterval( function (){
+        $('#temp-chart').load('reload.php').fadeIn("slow");
+      }, 10000); // refresh every 10000 milliseconds
+
+    </script>
 </head>
  
 <body>
@@ -23,9 +30,9 @@
           <span class="user-avatar"></span><a href="#"><span class="user-name">Ricardo!</span></a>
         </li>
         <li role="presentation" class="active"><a href="#">Dashboard</a></li>
-        <li role="presentation"><a href="#">Rooms</a></li>
+        <li role="presentation"><a href="{% url 'new_device' %}">Rooms</a></li>
         <li role="presentation"><a href="#">Archive</a></li>
-        <li role="presentation"><a href="#">Settings</a></li>
+        <li role="presentation"><a href="{% url 'new_user_setting' %}">Settings</a></li>
       </ul>
     </div>
   </div>

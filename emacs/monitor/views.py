@@ -32,6 +32,9 @@ def new_record(request):
 	device = Device.objects.get(manufacturer_id=record['device_id'])
 	#del record['device_id']
 	record['device'] = device.id
+	
+	device_state = device.__dict__
+	del device_state['_state']
 
 	serializer = RecordSerializer(data=record)
 	if serializer.is_valid():
@@ -46,7 +49,8 @@ def new_record(request):
 			prepared_settings.append(setting_dict)
 
 
-		return JSONResponse(prepared_settings, status=201)
+		callback = [prepared_settings, device_state]
+		return JSONResponse(callback, status=201)
 	return JSONResponse(serializer.errors, status=400)
 
 
@@ -86,8 +90,6 @@ class TempatureLineChartJSONView(BaseLineChartView):
         			if value_map[name][i] == '':
         				if i != 0 and i != (len(value_map[name]) -1):
         					value_map[name][i] = (value_map[name][i-1] + value_map[name][i+1])/2
-
-
         			i+=1		
 
 
@@ -114,6 +116,19 @@ class HumidityLineChartJSONView(BaseLineChartView):
         	
         	value_map[record.device.device_name].append(record.value)
 
+        	for name in value_map:
+        		if record.device.device_name != name:
+        			value_map[name].append('')
+
+        	for name in value_map:
+        		i = 0
+        		while i < len(value_map[name]):
+        			if value_map[name][i] == '':
+        				if i != 0 and i != (len(value_map[name]) -1):
+        					value_map[name][i] = (value_map[name][i-1] + value_map[name][i+1])/2
+        			i+=1
+
+
         value_lists = list()
         for device_name in value_map:
         	value_lists.append(value_map[device_name])
@@ -136,6 +151,18 @@ class PressureLineChartJSONView(BaseLineChartView):
         		value_map[record.device.device_name] = list()
         	
         	value_map[record.device.device_name].append(record.value)
+
+        	for name in value_map:
+        		if record.device.device_name != name:
+        			value_map[name].append('')
+
+        	for name in value_map:
+        		i = 0
+        		while i < len(value_map[name]):
+        			if value_map[name][i] == '':
+        				if i != 0 and i != (len(value_map[name]) -1):
+        					value_map[name][i] = (value_map[name][i-1] + value_map[name][i+1])/2
+        			i+=1
 
         value_lists = list()
         for device_name in value_map:

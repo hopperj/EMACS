@@ -4,3 +4,6 @@ from django.db import models
 class Device(models.Model):
     manufacturer_id = models.CharField(max_length=32)
     device_name = models.CharField(max_length=32)
+    tempature_control = models.BooleanField(default=False)
+    pressure_control = models.BooleanField(default=False)
+    humidity_control = models.BooleanField(default=False)
