@@ -10,10 +10,13 @@ from urllib2 import Request, urlopen, URLError
 from optparse import OptionParser
 import json
 import requests
+from datetime import datetime
+from time import sleep
+import sys, traceback
 
 class SerialServer:
 
-    def __init__(self, numberOfDevices=0, webAddress="http://192.168.100.207/monitor/new/", devicePrefix="/dev/ttyUSB", timeout=10.0, startCharacter='$'):
+    def __init__(self, numberOfDevices=0, webAddress="http://192.168.100.207/monitor/new/", devicePrefix="/dev/ttyUSB", device=None, timeout=0.50, startCharacter='$'):
         # Main web address
         self.webAddress = webAddress
         # Serial timeout value
@@ -26,7 +29,19 @@ class SerialServer:
         self.serialDevices = []
 
         self.startCharacter = startCharacter
+        self.timeout = timeout
 
+        #self.run = True
+        if device is not None:            
+            self.device = device
+            self.connect( self.device )
+        else:
+            self.connectSerial()
+
+
+    def connect(self, device):
+        ser = serial.Serial( device, baudrate=9600, timeout=self.timeout)
+        self.serialDevices = [ ser ]
 
     def closeAll(self):
         """
@@ -50,7 +65,8 @@ class SerialServer:
 
         self.serialDevices = []
         for i in range(self.numberOfDevices):
-            ser = serial.Serial( self.devicePrefix+str(i), baudrate=9600, timeout=10.0)
+            ser = serial.Serial( self.devicePrefix+str(i), baudrate=9600, timeout=self.timeout)
+            print "Added %d serial device"%i
             self.serialDevices.append( ser )
 
 
@@ -59,27 +75,45 @@ class SerialServer:
         Get data from serial and store as a dictionary
         """
         tmp = ""
+        tmpData = ""
         data = {}
         try:
             ser.write('$')
-            tmpData = ser.read(4096*5)
+            print "Start character sent"
+            tmpData = ""
+            tmp = ""
+            while tmp != "\n":
+                tmp = ser.read(1)
+                tmpData += tmp
         except serial.SerialTimeoutException:
             # Return 1 indicating error and None as the data
             return [1, None]
 
-        for ele in tmpData.split("\n"):
-            k,v = ele.split(':')
-            data[k] = float(v)
+        print "Got data",len(tmpData)
+        if len(tmpData) < 1:
+            return [1,None]
+        print "tmpData:",tmpData
+        try:
+            for ele in tmpData.rstrip().split(","):
+                k,v = ele.rstrip().split(':')
+                data[k] = v
+        except ValueError:
+            print "error data:",ele
+            print ele.rstrip().split(':')
+            print "\n\n"
+            traceback.print_exc(file=sys.stdout)
+            return [1,None]
 
-
-        return data
+        return [0, data]
 
 
     def sendToWeb(self, data):
         """
         curl -H 'Content-Type: application/json' -d '{"device": 1, "sensor_name": "temp1", "value": 22, "created_at": "1000000987"}' 127.0.0.1:8000/monitor/new/
         """
+        # Put data into a json object
         payload = json.dumps(data)
+        # Build headers
         headers = {'content-type': 'application/json'}
 
         response = requests.put(self.webAddress, data=payload, headers=headers)
@@ -91,12 +125,21 @@ class SerialServer:
         Send control settings to Arduino
         """
         data = ""
-        for k,v in res.items():
-            data += k+":"+str(v)+","
-
+        print res.keys()
+        if len(res.keys())<1:
+            return
+        try:
+            for k,v in res.items():
+                data += str(k)+":"+str(v[0])+","
+        except:
+            print "Couldn't parse key value pairs."
         # Get rid of the last
-        data = data[-1]
-        ser.write(res)
+        data = data[:-1]
+        print "Sending:",data
+        ser.write('@')
+        while ser.read(1) != '@':
+            pass
+        #ser.write(data)
 
     def run(self):
         """
@@ -104,11 +147,27 @@ class SerialServer:
         getting data, sending to web server, get control data
         and send back to arduino.
         """
-        for ser in self.serialDevices:
-            err, data = self.getData(ser)
-            if not err and data is not None:
-                res = self.sendToWeb( data )
-                self.sendToSerial( ser, res )
+        while 1:
+            print "Looping"
+            d0 = datetime.now()
+            for ser in self.serialDevices:
+                ser.flush()
+                print "Getting data from Arduino"
+                err, data = self.getData(ser)
+                if not err and data is not None:
+                    print "Sending data to website"
+                    res = self.sendToWeb( data )
+                    if res is not None:
+                        print "Sending control data back to arduino"
+                        self.sendToSerial( ser, res )
+                else:
+                    print "There was an error"
+                    print "--->",err, data
+            dt = ( datetime.now() - d0 ).total_seconds()
+            print "DeltaTime:",dt
+            if dt < 2.0:
+                print "\n\n\n"
+                sleep( 2.0 - dt ) 
 
 
 if __name__ == "__main__":
@@ -118,12 +177,19 @@ if __name__ == "__main__":
                       help="Number of devices connected")
     parser.add_option("-s", "--server", dest="server",
                       help="Server to send data too")    
-    parser.add_option("-q", "--quiet",
-                      action="store_false", dest="verbose", default=True,
-                      help="don't print status messages to stdout")
-
+    parser.add_option("-p", "--prefix", dest="devicePrefix",
+                      help="Prefix for devices")
+    parser.add_option("--serial", dest="serial",
+                      help="Specific serial device")
     (options, args) = parser.parse_args()
 
-    SS = SerialServer(numberOfDevices = options.noOfDevices, webAddress=options.server)
-    data = {"device": 1, "sensor_name": "temp1", "value": 22, "created_at": "1000000987"}
-    SS.sendToWeb( data )
+    SS = SerialServer(numberOfDevices = int(options.noOfDevices), webAddress=options.server, device=options.serial)
+    #data = {"device": 1, "sensor_name": "temp1", "value": 22, "created_at": "1000000987"}
+    #res = SS.sendToWeb( data )
+    #SS.sendToSerial( ser, res )
+    print "Going into run mode"
+    try:
+        SS.run()
+    except KeyboardInterrupt:
+        #SS.run = False
+        SS.closeAll()
