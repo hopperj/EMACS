@@ -34,7 +34,7 @@ def new_record(request):
 	record['device'] = device.id
 	
 	device_state = device.__dict__
-	del device_state['_state']
+	del device['_state']
 
 	serializer = RecordSerializer(data=record)
 	if serializer.is_valid():
