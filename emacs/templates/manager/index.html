@@ -1,40 +1,29 @@
 {% extends "base.html" %}
 {% block content %}
-<table class="tempature1">
-<thead>
-	<tr>
-		<th>Time</th>
-		<th>Value</th>
-	</tr>
-	</thead>
-	<tbody>
 
-	{% for record in device_1 %}
-	<tr>
-		<td>{{ record.0 }}</td>
-		<td>{{ record.1 }}</td>
-	</tr>
-	
-	{% endfor %}
-	</tbody>
-</table>
+<div class="widget-wrapper">
+	<div class="widget-header">
+		<span class="widget-title">Tempature</span>
+	</div>
+	<div class="pull-left current-state">
+		<div class="current-value">
+			<span class="the-value">18&deg</span>
+			<span class="the-measure">Average (C)</span>
+		</div>
+		<div class="min-max">
+			<span class="min">17</span>
+			<span class="max">22</span>
+		</div>
+	</div>
+	<canvas id="myChart" class="visualization" width="500" height="400"></canvas>	
+</div>
 
-<table class="tempature2">
-<thead>
-	<tr>
-		<th>Time</th>
-		<th>Value</th>
-	</tr>
-	</thead>
-	<tbody>
 
-	{% for record in device_2 %}
-	<tr>
-		<td>{{ record.0 }}</td>
-		<td>{{ record.1 }}</td>
-	</tr>
-	
-	{% endfor %}
-	</tbody>
-</table>
+<script type="text/javascript">
+            $.get('{% url "line_chart_json" %}', function(data) {
+                var ctx = $("#myChart").get(0).getContext("2d");
+                new Chart(ctx).Line(data);
+            });
+ </script>
+
 {% endblock %}

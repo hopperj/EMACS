@@ -1,46 +1,42 @@
 {% load bootstrap3 %}
-{% load staticfiles %}
-<!doctype html>
+<!DOCTYPE html>
 <html>
 <head>
     <title>EMACS | Environmental Monitoring and Control System</title>
-    <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.js" />
-    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+
+    <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.js" ></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}js/Chart.min.js"></script>
     {% bootstrap_css %}
+    {% bootstrap_javascript %}
     {{ form.media }}
     <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}manager/styles.css">
     <script type="text/javascript" src="{{ STATIC_URL }}manager/functions.js" ></script>
 </head>
  
 <body>
-  <div class="container">
-
-  <!-- Static navbar -->
-      <div class="navbar navbar-default" role="navigation">
-        <div class="container-fluid">
-          <div class="navbar-header">
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-              <span class="sr-only">Toggle navigation</span>
-              <span class="icon-bar"></span>
-              <span class="icon-bar"></span>
-              <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand" href="/">EMACS User Dashboard</a>
-          </div>
-          <div class="navbar-collapse collapse">
-            <ul class="nav navbar-nav">
-              
-	           </ul>
-          </div><!--/.nav-collapse -->
-      </div><!--/.container-fluid -->
+  <div class="container-fluid page-wrapper">
+    <div class="container col-md-2 navigation-wrapper">
+    <!-- Static navbar -->
+    <div class="navbar" role="navigation">
+      <ul class="nav nav-stacked dashboard-nav">
+        <li role="presentation">
+          <span class="user-avatar"></span><a href="#"><span class="user-name">Ricardo!</span></a>
+        </li>
+        <li role="presentation" class="active"><a href="#">Dashboard</a></li>
+        <li role="presentation"><a href="#">Rooms</a></li>
+        <li role="presentation"><a href="#">Archive</a></li>
+        <li role="presentation"><a href="#">Settings</a></li>
+      </ul>
+    </div>
   </div>
       
-  <div class="container">
+  <div class="container col-md-10">
     <div id="spinner">
-	     <h3><span class="spinner-message"></span></h3>
+      <h3><span class="spinner-message"></span></h3>
     </div>
       <!-- Main component for a primary marketing message or call to action -->
-    <div class="jumbotron">
+    <div class="main-content">
+
 	   {% block content %}{% endblock %}
      {% block content-related %}{% endblock %}
     </div>
@@ -48,5 +44,4 @@
   </div>
 </div>
 </body>
-  {% bootstrap_javascript %}
 </html>

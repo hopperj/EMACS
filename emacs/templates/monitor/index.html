@@ -1,10 +1,16 @@
 {% extends "base.html" %}
 {% block content %}
 
-{% for record in device_1 %}
 
-	{{ record.as_p }}
-
-{% endfor %}
+<div style="widget-wrapper">
+	<div class="widget-header">Tempature</div>
+	<svg id="visualisation" width="1000" height="500"></svg>
+</div>
+ 	<script type="text/javascript">
+            $.get('{% url "line_chart_json" %}', function(data) {
+                var ctx = $("#myChart").get(0).getContext("2d");
+                new Chart(ctx).Line(data);
+            });
+</script>
 
 {% endblock %}

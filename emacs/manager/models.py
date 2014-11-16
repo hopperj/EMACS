@@ -1,5 +1,4 @@
 from django.db import models
-
 from device.models import Device
 
 class UserSetting(models.Model):

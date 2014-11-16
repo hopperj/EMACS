@@ -6,6 +6,7 @@ Unidecode==0.04.16
 argparse==1.2.1
 django-bootstrap3==4.11.0
 django-bower==5.0.1
+django-chartjs==1.0
 django-d3==3.3.11
 django-filter==0.8
 django-jquery==1.9.1
