@@ -1,0 +1,58 @@
+body {
+	margin: 0;
+	padding: 0; 
+	height: 100%;
+}
+
+.page-wrapper{
+	background-color: #eee;
+}
+
+.navigation-wrapper{
+	background-color: darkgrey;
+	height: 768px;
+}
+
+
+.widget-wrapper {
+	position: relative;
+	background-color: lightgrey;
+}
+
+.widget-header {
+	padding: 0;
+	margin: 0;
+	color: white;
+	background-color: darkgrey;
+	width: 100%;
+	position: absolute;
+	top: 0;
+	padding: 3px;
+}
+
+.widget-title {
+	padding-left: 1em;
+}
+
+.visualization {
+	padding: 10px;
+	margin: 10px;
+	background-color: #eee;
+}
+
+.main-content{
+	margin: 0;
+	background-color: darkgrey;
+}
+
+.active{
+	background-color: #eee;
+	margin-right: -1.2em;
+}
+
+.current-state{
+	position: absolute;
+	top: 50%;
+	width: 25%;
+	margin-right: 5px;
+}

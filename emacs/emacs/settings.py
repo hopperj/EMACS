@@ -39,8 +39,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
-    'djangobower',
-    'd3',
+    'chartjs',
     'rest_framework',
     'jquery',
     'bootstrap3',
@@ -63,7 +62,6 @@ MIDDLEWARE_CLASSES = (
 STATICFILES_FINDERS = (
     "django.contrib.staticfiles.finders.FileSystemFinder",
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
-    
 )
 
 ROOT_URLCONF = 'emacs.urls'

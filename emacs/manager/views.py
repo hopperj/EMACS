@@ -30,13 +30,24 @@ class UpdateUserSettingView(UpdateView):
 		# It should return an HttpResponse.
 		return super(UpdateUserSettingView, self).form_valid(form)
 
-class CollectionListView(ListView):
+class UserSettingListView(ListView):
     model = UserSetting
     template_name = "manager/user_settings_list.html"
     
     def get_queryset(self):
-        settings = Collection.objects.all
+        settings = Collection.objects.all()
         return settings
+
+
+class UserSettingIndexView(TemplateView):
+
+	template_name = 'manager/settings.html'
+
+	def get_context_data(self, **kwargs):
+		context = super(UserSettingIndexView, self).get_context_data(**kwargs)
+		context['user_settings'] = UserSetting.objects.all()
+		return context
+
          
 class ManagerIndexView(TemplateView):
 
@@ -44,24 +55,4 @@ class ManagerIndexView(TemplateView):
 
 	def get_context_data(self, **kwargs):
 		context = super(ManagerIndexView, self).get_context_data(**kwargs)
-		xdata = ["Apple", "Apricot", "Avocado", "Banana", "Boysenberries", "Blueberries", "Dates", "Grapefruit", "Kiwi", "Lemon"]
-		ydata = [52, 48, 160, 94, 75, 71, 490, 82, 46, 17]
-		chartdata = {'x': xdata, 'y': ydata}
-		charttype = "pieChart"
-		chartcontainer = 'piechart_container'
-		data = {
-    		'charttype': charttype,
-    		'chartdata': chartdata,
-    		'chartcontainer': chartcontainer,
-    		'extra': {
-        		'x_is_date': False,
-        		'x_axis_format': '',
-        		'tag_script_js': True,
-        		'jquery_on_ready': False,
-    		}
-		}
-
-		context['data'] = data
-		context['device_1'] = [(1,15), (2,16), (3,12), (4,26), (5,17), (6,9), (7,9), (8,8), (9,3), (10, 4)]
-		context['device_2'] = [(1,4), (2,4), (3,6), (4,3), (5,19), (6,20), (7,20), (8,21), (9,22), (10, 1)]
 		return context

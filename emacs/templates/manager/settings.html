@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% for setting in user_settings %}
+
+	<p><b>Measure:</b> {{ setting.measure }}</p> 
+	<p><b>Measure:</b> {{ setting.value }}</p>
+	<p><b>Measure:</b> {{ setting.device }}</p>
+
+{% endfor %}
+
+
+{% endblock %}
