@@ -12,10 +12,11 @@ import json
 import requests
 from datetime import datetime
 from time import sleep
+import sys, traceback
 
 class SerialServer:
 
-    def __init__(self, numberOfDevices=0, webAddress="http://192.168.100.207/monitor/new/", devicePrefix="/dev/ttyUSB", device=None, timeout=10.0, startCharacter='$'):
+    def __init__(self, numberOfDevices=0, webAddress="http://192.168.100.207/monitor/new/", devicePrefix="/dev/ttyUSB", device=None, timeout=0.75, startCharacter='$'):
         # Main web address
         self.webAddress = webAddress
         # Serial timeout value
@@ -28,6 +29,7 @@ class SerialServer:
         self.serialDevices = []
 
         self.startCharacter = startCharacter
+        self.timeout = timeout
 
         #self.run = True
         if device is not None:            
@@ -38,7 +40,7 @@ class SerialServer:
 
 
     def connect(self, device):
-        ser = serial.Serial( device, baudrate=9600, timeout=10.0)
+        ser = serial.Serial( device, baudrate=9600, timeout=self.timeout)
         self.serialDevices = [ ser ]
 
     def closeAll(self):
@@ -63,7 +65,7 @@ class SerialServer:
 
         self.serialDevices = []
         for i in range(self.numberOfDevices):
-            ser = serial.Serial( self.devicePrefix+str(i), baudrate=9600, timeout=10.0)
+            ser = serial.Serial( self.devicePrefix+str(i), baudrate=9600, timeout=self.timeout)
             print "Added %d serial device"%i
             self.serialDevices.append( ser )
 
@@ -76,18 +78,23 @@ class SerialServer:
         data = {}
         try:
             ser.write('$')
-            tmpData = ser.read(100)
-            print "Got data"
+            print "Start character sent"
+            tmpData = ser.read(4096)
         except serial.SerialTimeoutException:
             # Return 1 indicating error and None as the data
             return [1, None]
 
-        print tmpData
-
-        for ele in tmpData.split(","):
-            k,v = ele.split(':')
-            data[k] = v
-
+        print "Got data",len(tmpData)
+        if len(tmpData) < 1:
+            return [1,None]
+        print "tmpData:",tmpData
+        try:
+            for ele in tmpData.split(","):
+                k,v = ele.split(':')
+                data[k] = v
+        except ValueError:
+            traceback.print_exc(file=sys.stdout)
+            return [1,None]
 
         return [0, data]
 
@@ -110,12 +117,18 @@ class SerialServer:
         Send control settings to Arduino
         """
         data = ""
-        for k,v in res.items():
-            data += k+":"+str(v)+","
-
+        print res.keys()
+        if len(res.keys())<1:
+            return
+        try:
+            for k,v in res.items():
+                data += str(k)+":"+str(v[0])+","
+        except:
+            print "Couldn't parse key value pairs."
         # Get rid of the last
-        data = data[-1]
+        data = data[:-1]
         ser.write('@')
+        print "Sending:",data
         ser.write(data)
 
     def run(self):
@@ -128,19 +141,23 @@ class SerialServer:
             print "Looping"
             d0 = datetime.now()
             for ser in self.serialDevices:
+                ser.flush()
                 print "Getting data from Arduino"
                 err, data = self.getData(ser)
                 if not err and data is not None:
                     print "Sending data to website"
                     res = self.sendToWeb( data )
-                    print "Sending control data back to arduino"
-                    self.sendToSerial( ser, res )
+                    if res is not None:
+                        print "Sending control data back to arduino"
+                        self.sendToSerial( ser, res )
                 else:
                     print "There was an error"
-                    print err, data
+                    print "--->",err, data
             dt = ( datetime.now() - d0 ).total_seconds()
-            if dt > 10:
-                sleep( 10 - dt ) 
+            print "DeltaTime:",dt
+            if dt < 2.0:
+                print "\n\n\n"
+                sleep( 2.0 - dt ) 
 
 
 if __name__ == "__main__":
