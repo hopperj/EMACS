@@ -21,12 +21,15 @@ void loop() {
 
   float temp_c_SHT; //SHT1x temperature
   float temp_c_mpl; //MPL115a2 temperature
-  float humidity; //humidity from SHT15
-  float pressure; // pressure from MPL115a2
+  float temp; //Averaged temperature (Celcius)
+  float humidity; //humidity from SHT15 (Realtive %)
+  float pressure; // pressure from MPL115a2 (kPa)
   char device_id[8] = "Remote1";
-  static char outstr[15];
   
-  while(1) {
+  while(1) 
+  {
+    //The arduino is continuously reading sensor data
+    
     //SHT15 readings
     temp_c_SHT = sht1x.readTemperatureC();
     humidity = sht1x.readHumidity();
@@ -36,13 +39,28 @@ void loop() {
     pressure = mpl115a2.getPressure();
     // Send data along USB through serial for local monitoring
     Serial.print(temp_c_mpl,2); Serial.print(" ");Serial.print(temp_c_SHT,2);Serial.print(" ");Serial.print(humidity, 2);Serial.print(" ");Serial.println(pressure);
+  
+    temp = (temp_c_SHT+temp_c_mpl)/2.0;
     
+    delay(1000);
+    
+    if (mySerial.read())
+    {
+      transmit_data(temp, humidity, pressure, device_id);
+    }
+  } 
+}
+
+void transmit_data(float temp, float humidity, float pressure, char device_id[8])
+ {
+     static char outstr[15];
+     
     //Send all collected data along XBEE. Comma delimited string with identifier for each variable. 
     mySerial.write(device_id);
     mySerial.write(",");
     mySerial.write("temp");
     mySerial.write(",");
-    dtostrf((temp_c_SHT+temp_c_mpl)/2.0, 6, 3, outstr);
+    dtostrf(temp, 6, 3, outstr);
     mySerial.write(outstr);
     mySerial.write(",");
     mySerial.write("humidity");
@@ -55,7 +73,4 @@ void loop() {
     dtostrf(pressure, 7, 3, outstr);
     mySerial.write(outstr);
     mySerial.write("\r\n");
-    delay(1000);
-  }
- 
-}
+ }
