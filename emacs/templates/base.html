@@ -11,6 +11,7 @@
     {{ form.media }}
     <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}manager/styles.css">
     <script type="text/javascript" src="{{ STATIC_URL }}manager/functions.js" ></script>
+<<<<<<< HEAD
 
     <script type="text/javascript">
       var temp_refresh = setInterval( function (){
@@ -20,6 +21,8 @@
       }, 7000); // refresh every 10000 milliseconds
 
     </script>
+=======
+>>>>>>> 26c404b8bea56bf4d13f0b14e4cdf17245a49815
 </head>
  
 <body>
@@ -30,9 +33,15 @@
       <ul class="nav nav-stacked dashboard-nav">
         <li role="presentation"><a href="#"><img src="{{ STATIC_URL }}/manager/milo-logo-long.svg" class="logo-nav"></a></li>    
         <li role="presentation" class="active"><a href="#">Dashboard</a></li>
+<<<<<<< HEAD
         <li role="presentation"><a href="{% url 'new_device' %}">Rooms</a></li>
         <li role="presentation"><a href="{% url 'new_user_setting' %}">Settings</a></li>
         
+=======
+        <li role="presentation"><a href="#">Rooms</a></li>
+        <li role="presentation"><a href="#">Archive</a></li>
+        <li role="presentation"><a href="#">Settings</a></li>
+>>>>>>> 26c404b8bea56bf4d13f0b14e4cdf17245a49815
       </ul>
     </div>
   </div>

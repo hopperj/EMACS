@@ -15,12 +15,13 @@
 			<span class="max">22</span>
 		</div>
 	</div>
-	<canvas id="temp-chart" class="visualization" width="500" height="400"></canvas>	
+	<canvas id="myChart" class="visualization" width="500" height="400"></canvas>	
 </div>
 
 
 <script type="text/javascript">
             $.get('{% url "tempature_line_chart" %}', function(data) {
+<<<<<<< HEAD
                 var ctx = $("#temp-chart").get(0).getContext("2d");
                 new Chart(ctx).Line(data);
             });
@@ -72,6 +73,9 @@
 <script type="text/javascript">
             $.get('{% url "humidity_line_chart" %}', function(data) {
                 var ctx = $("#humidity-chart").get(0).getContext("2d");
+=======
+                var ctx = $("#myChart").get(0).getContext("2d");
+>>>>>>> 26c404b8bea56bf4d13f0b14e4cdf17245a49815
                 new Chart(ctx).Line(data);
             });
  </script>

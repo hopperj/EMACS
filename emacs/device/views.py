@@ -10,7 +10,7 @@ from .models import	Device
 # new device form
 class NewDeviceView(CreateView):
 	model = Device
-	fields = ['manufacturer_id', 'device_name', 'tempature_control', 'pressure_control', 'humidity_control']
+	fields = ['manufacturer_id', 'device_name']
 	success_url = reverse_lazy('index')
     
 	def form_valid(self, form):
