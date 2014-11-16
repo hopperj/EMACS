@@ -32,12 +32,10 @@ def new_record(request):
 	device = Device.objects.get(manufacturer_id=record['device_id'])
 	#del record['device_id']
 	record['device'] = device.id
-<<<<<<< HEAD
 	
 	device_state = device.__dict__
 	del device['_state']
-=======
->>>>>>> 26c404b8bea56bf4d13f0b14e4cdf17245a49815
+
 
 	serializer = RecordSerializer(data=record)
 	if serializer.is_valid():
