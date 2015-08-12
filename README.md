@@ -1,5 +1,5 @@
 EMACS 
-Environmental Environment And Control System
+Environmental Management And Control System
 =====
 
 Volta November Hackathon
